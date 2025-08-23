@@ -1,0 +1,130 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* Updated color tokens to emerald green theme from design brief */
+  --background: #ecfdf5;
+  --foreground: #064e3b;
+  --card: #d1fae5;
+  --card-foreground: #064e3b;
+  --popover: #f0fdf4;
+  --popover-foreground: #064e3b;
+  --primary: #059669;
+  --primary-foreground: #ffffff;
+  --secondary: #10b981;
+  --secondary-foreground: #ffffff;
+  --muted: #a7f3d0;
+  --muted-foreground: #065f46;
+  --accent: #34d399;
+  --accent-foreground: #064e3b;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: #6ee7b7;
+  --input: #f0fdf4;
+  --ring: rgba(9, 150, 105, 0.5);
+  --chart-1: #facc15;
+  --chart-2: #4ade80;
+  --chart-3: #3b82f6;
+  --chart-4: #9333ea;
+  --chart-5: #ef4444;
+  --radius: 0.5rem;
+  --sidebar: #d1fae5;
+  --sidebar-foreground: #064e3b;
+  --sidebar-primary: #059669;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #10b981;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #6ee7b7;
+  --sidebar-ring: rgba(9, 150, 105, 0.5);
+}
+
+.dark {
+  /* Updated dark mode tokens with emerald theme */
+  --background: #022c22;
+  --foreground: #a7f3d0;
+  --card: #064e3b;
+  --card-foreground: #d1fae5;
+  --popover: #065f46;
+  --popover-foreground: #ecfdf5;
+  --primary: #10b981;
+  --primary-foreground: #ffffff;
+  --secondary: #059669;
+  --secondary-foreground: #ffffff;
+  --muted: #065f46;
+  --muted-foreground: #6ee7b7;
+  --accent: #34d399;
+  --accent-foreground: #022c22;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: #047857;
+  --input: #065f46;
+  --ring: rgba(16, 185, 129, 0.5);
+  --chart-1: #facc15;
+  --chart-2: #4ade80;
+  --chart-3: #3b82f6;
+  --chart-4: #9333ea;
+  --chart-5: #ef4444;
+  --sidebar: #064e3b;
+  --sidebar-foreground: #d1fae5;
+  --sidebar-primary: #10b981;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #34d399;
+  --sidebar-accent-foreground: #022c22;
+  --sidebar-border: #047857;
+  --sidebar-ring: rgba(16, 185, 129, 0.5);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  /* Added font family variables for Montserrat and Open Sans */
+  --font-sans: var(--font-open-sans);
+  --font-serif: var(--font-montserrat);
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
