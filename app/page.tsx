@@ -541,17 +541,17 @@ export default function NFTMintingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black relative">
+    <div className="h-screen bg-black relative overflow-hidden">
       {/* Canvas animation background - matches DEX Intuition style */}
       <canvas
         ref={canvasRef}
         className="fixed inset-0 pointer-events-none z-0"
         style={{ width: "100vw", height: "100vh" }}
       />
-      <header className="border-b border-gray-800/30 bg-gray-950/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 py-3 sm:py-4 lg:py-5">
-          <div className="flex items-center justify-between gap-2 sm:gap-4">
-            <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-serif font-black text-white shrink-0">
+      <header className="border-b border-white/10 sticky top-0 z-50" style={{height: '70px', background: 'rgba(0, 0, 0, 0.7)', backdropFilter: 'blur(12px)'}}>
+        <div className="w-full max-w-7xl mx-auto px-8 h-full">
+          <div className="flex items-center justify-between h-full">
+            <h1 className="text-xl font-bold text-white tracking-wide">
               GENESIS NFT
             </h1>
 
@@ -567,7 +567,7 @@ export default function NFTMintingPage() {
                   variant="outline"
                   onClick={disconnectWallet}
                   size="sm"
-                  className="h-8 sm:h-9 lg:h-10 px-2 sm:px-3 lg:px-4 text-xs sm:text-sm text-white border-white/30 hover:bg-white/10"
+                  className="h-10 px-5 text-sm text-white border-white/30 hover:bg-white/10 rounded-lg"
                 >
                   Disconnect
                 </Button>
@@ -576,30 +576,29 @@ export default function NFTMintingPage() {
               <Button
                 onClick={connectWallet}
                 disabled={isConnecting}
-                size="sm"
-                className="flex items-center gap-1 sm:gap-2 h-8 sm:h-9 lg:h-10 px-2 sm:px-3 lg:px-4 text-xs sm:text-sm bg-white text-black hover:bg-gray-100"
+                className="flex items-center gap-2 h-10 px-5 text-sm bg-white/95 text-gray-900 hover:bg-white hover:shadow-lg hover:-translate-y-0.5 transition-all rounded-lg font-semibold"
               >
                 {isConnecting ? (
-                  <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
+                  <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  <Wallet className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <Wallet className="h-4 w-4" />
                 )}
-                <span className="hidden xs:inline">
+                <span>
                   {isConnecting ? "Connecting..." : "Connect Wallet"}
                 </span>
-                <span className="xs:hidden">{isConnecting ? "..." : "Connect"}</span>
               </Button>
             )}
           </div>
         </div>
       </header>
 
-      <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 py-8 sm:py-12 lg:py-16 relative z-10">
-        <div className="text-center mb-8 sm:mb-12 lg:mb-16 xl:mb-20">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-serif font-black text-white mb-3 sm:mb-4 md:mb-5 lg:mb-6">
+      <main className="w-full max-w-5xl mx-auto px-4 sm:px-6 py-2 sm:py-4 relative z-10 h-full overflow-y-auto" style={{height: 'calc(100vh - 70px)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between'}}>
+        <div className="flex-1 flex flex-col justify-center">
+          <div className="text-center mb-8">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold mb-4 bg-gradient-to-br from-white to-slate-400 bg-clip-text text-transparent" style={{lineHeight: '1.1'}}>
             Hello Intuition Builder
           </h2>
-          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-400 max-w-sm sm:max-w-lg md:max-w-2xl lg:max-w-3xl xl:max-w-4xl mx-auto italic leading-relaxed">
+          <p className="text-base text-white/70 max-w-2xl mx-auto leading-relaxed">
             An early builder badge on the Intuition Network.
           </p>
         </div>
@@ -650,40 +649,40 @@ export default function NFTMintingPage() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 xl:gap-10 mb-8 sm:mb-12 lg:mb-16 relative z-10">
-          <Card className="bg-gray-900 border-gray-700 hover:bg-gray-800 hover:border-gray-600 transition-colors duration-300 relative z-10">
-            <CardHeader className="text-center">
-              <CardTitle className="text-2xl font-serif font-bold text-white">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 relative z-10">
+          <Card className="text-center p-5 hover:backdrop-blur-xl transition-all duration-300 relative z-10" style={{background: 'rgba(15, 23, 42, 0.4)', border: '1px solid rgba(148, 163, 184, 0.2)', backdropFilter: 'blur(20px)', minHeight: '120px'}}>
+            <CardHeader className="text-center p-0">
+              <CardTitle className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white mb-2">
                 {totalSupply}
               </CardTitle>
-              <CardDescription className="text-gray-400">Total Minted</CardDescription>
+              <CardDescription className="text-white/60 text-sm font-medium">Total Minted</CardDescription>
             </CardHeader>
           </Card>
 
-          <Card className="bg-gray-900 border-gray-700 hover:bg-gray-800 hover:border-gray-600 transition-colors duration-300 relative z-10">
-            <CardHeader className="text-center">
-              <CardTitle className="text-2xl font-serif font-bold text-white">
+          <Card className="text-center p-5 hover:backdrop-blur-xl transition-all duration-300 relative z-10" style={{background: 'rgba(15, 23, 42, 0.4)', border: '1px solid rgba(148, 163, 184, 0.2)', backdropFilter: 'blur(20px)', minHeight: '120px'}}>
+            <CardHeader className="text-center p-0">
+              <CardTitle className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white mb-2">
                 {maxSupply}
               </CardTitle>
-              <CardDescription className="text-gray-400">Max Supply</CardDescription>
+              <CardDescription className="text-white/60 text-sm font-medium">Max Supply</CardDescription>
             </CardHeader>
           </Card>
 
-          <Card className="bg-gray-900 border-gray-700 hover:bg-gray-800 hover:border-gray-600 transition-colors duration-300 relative z-10">
-            <CardHeader className="text-center">
-              <CardTitle className="text-2xl font-serif font-bold text-white">
+          <Card className="text-center p-5 hover:backdrop-blur-xl transition-all duration-300 relative z-10" style={{background: 'rgba(15, 23, 42, 0.4)', border: '1px solid rgba(148, 163, 184, 0.2)', backdropFilter: 'blur(20px)', minHeight: '120px'}}>
+            <CardHeader className="text-center p-0">
+              <CardTitle className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white mb-2">
                 {mintPrice === "0" ? "Free" : `${mintPrice} tTRUST`}
               </CardTitle>
-              <CardDescription className="text-gray-400">Mint Price</CardDescription>
+              <CardDescription className="text-white/60 text-sm font-medium">Mint Price</CardDescription>
             </CardHeader>
           </Card>
         </div>
 
-        <div className="max-w-md mx-auto mb-12 relative z-10">
-          <Card className="bg-gray-900 border-gray-700 relative z-10">
-            <CardHeader className="text-center">
-              <CardTitle className="font-serif font-bold text-white">Mint Your NFT</CardTitle>
-              <CardDescription className="text-gray-400">
+        <div className="max-w-md mx-auto mb-6 relative z-10">
+          <Card className="p-8 relative z-10" style={{background: 'rgba(15, 23, 42, 0.4)', border: '1px solid rgba(148, 163, 184, 0.2)', backdropFilter: 'blur(20px)'}}>
+            <CardHeader className="text-center p-0 mb-6">
+              <CardTitle className="text-2xl font-bold text-white mb-3">Mint Your NFT</CardTitle>
+              <CardDescription className="text-white/70 text-base">
                 {account ? "Ready to mint your unique NFT" : "Connect your wallet to get started"}
               </CardDescription>
             </CardHeader>
@@ -698,8 +697,7 @@ export default function NFTMintingPage() {
                 <Button
                   onClick={mintNFT}
                   disabled={isMinting || totalSupply >= maxSupply || !!networkError}
-                  className="w-full h-12 text-lg font-semibold"
-                  size="lg"
+                  className="w-full h-14 text-base font-semibold bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/10 hover:border-blue-500/50 hover:-translate-y-1 transition-all rounded-xl"
                 >
                   {isMinting ? (
                     <>
@@ -716,8 +714,7 @@ export default function NFTMintingPage() {
                 <Button
                   onClick={connectWallet}
                   disabled={isConnecting}
-                  className="w-full h-12 text-lg font-semibold"
-                  size="lg"
+                  className="w-full h-14 text-base font-semibold bg-white/95 text-gray-900 hover:bg-white hover:-translate-y-1 transition-all rounded-xl"
                 >
                   {isConnecting ? (
                     <>
@@ -790,12 +787,13 @@ export default function NFTMintingPage() {
             )}
           </div>
         )}
+        </div>
       </main>
 
-      <footer className="border-t border-border mt-16">
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 py-8 sm:py-12 text-center">
-          <p className="text-gray-400">Built with React, Ethers.js, and modern Web3 technologies</p>
-        </div>
+      <footer className="text-center py-4 relative z-10">
+        <p className="text-sm text-gray-400">
+          Built with React, Ethers.js, and modern Web3 technologies
+        </p>
       </footer>
     </div>
   );
