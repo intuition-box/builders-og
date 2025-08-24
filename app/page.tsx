@@ -292,23 +292,24 @@ export default function NFTMintingPage() {
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 py-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-serif font-black text-card-foreground">GENESIS NFT</h1>
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 py-3 sm:py-4 lg:py-5">
+          <div className="flex items-center justify-between gap-2 sm:gap-4">
+            <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-serif font-black text-card-foreground shrink-0">GENESIS NFT</h1>
 
             {account ? (
-              <div className="flex items-center gap-4">
-                <Badge variant="secondary" className="px-3 py-1">
+              <div className="flex items-center gap-2 sm:gap-3 lg:gap-4">
+                <Badge variant="secondary" className="px-2 sm:px-3 py-1 text-xs sm:text-sm hidden xs:flex">
                   {`${account.slice(0, 6)}...${account.slice(-4)}`}
                 </Badge>
-                <Button variant="outline" onClick={disconnectWallet}>
+                <Button variant="outline" onClick={disconnectWallet} size="sm" className="h-8 sm:h-9 lg:h-10 px-2 sm:px-3 lg:px-4 text-xs sm:text-sm">
                   Disconnect
                 </Button>
               </div>
             ) : (
-              <Button onClick={connectWallet} disabled={isConnecting} className="flex items-center gap-2">
-                {isConnecting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wallet className="h-4 w-4" />}
-                {isConnecting ? "Connecting..." : "Connect Wallet"}
+              <Button onClick={connectWallet} disabled={isConnecting} size="sm" className="flex items-center gap-1 sm:gap-2 h-8 sm:h-9 lg:h-10 px-2 sm:px-3 lg:px-4 text-xs sm:text-sm">
+                {isConnecting ? <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" /> : <Wallet className="h-3 w-3 sm:h-4 sm:w-4" />}
+                <span className="hidden xs:inline">{isConnecting ? "Connecting..." : "Connect Wallet"}</span>
+                <span className="xs:hidden">{isConnecting ? "..." : "Connect"}</span>
               </Button>
             )}
           </div>
