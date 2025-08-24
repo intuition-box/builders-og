@@ -101,13 +101,13 @@ export default function NFTMintingPage() {
 
     // Create constellation grid with cluster distribution
     const createConstellationGrid = () => {
-      const gridSize = 15; // 15x15 grid (reduced density)
+      const gridSize = 12; // 12x12 grid (further reduced density)
       const jitter = 40; // ±40px randomization (increased)
 
       for (let x = 0; x < window.innerWidth; x += window.innerWidth / gridSize) {
         for (let y = 0; y < window.innerHeight; y += window.innerHeight / gridSize) {
-          // Create breathing zones - skip 20% of points randomly
-          if (Math.random() < 0.2) continue;
+          // Create breathing zones - skip 30% of points randomly (increased)
+          if (Math.random() < 0.3) continue;
 
           const jitterX = (Math.random() - 0.5) * jitter * 2;
           const jitterY = (Math.random() - 0.5) * jitter * 2;
@@ -152,8 +152,8 @@ export default function NFTMintingPage() {
     const regenerateParticles = () => {
       points.length = 0; // Clear existing particles
       
-      // Recalculate particle count based on screen size (adaptive density)
-      const particleCount = Math.floor((window.innerWidth * window.innerHeight) / 15000);
+      // Recalculate particle count based on screen size (reduced density)
+      const particleCount = Math.floor((window.innerWidth * window.innerHeight) / 20000); // Reduced density
       const gridSize = Math.sqrt(particleCount);
       const jitter = 40;
 
@@ -256,11 +256,11 @@ export default function NFTMintingPage() {
 
       });
 
-      // Draw dynamic connections with max 3 connections per point
-      const maxConnectionsPerPoint = 3;
-      const maxDistance = 120;
+      // Draw dynamic connections with max 2 connections per point (reduced)
+      const maxConnectionsPerPoint = 2;
+      const maxDistance = 100; // Reduced distance
       const minOpacity = 0.1;
-      const maxOpacity = 0.6;
+      const maxOpacity = 0.4; // Reduced max opacity
 
       points.forEach((particle, i) => {
         let connectionCount = 0;
