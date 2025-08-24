@@ -131,6 +131,67 @@ export default function NFTMintingPage() {
 
     createConstellationGrid();
 
+    // Handle resize with particle repositioning
+    const handleResize = () => {
+      resizeCanvas();
+      
+      // Reposition existing particles to stay within bounds
+      points.forEach(point => {
+        if (point.x > window.innerWidth) point.x = window.innerWidth - 50;
+        if (point.y > window.innerHeight) point.y = window.innerHeight - 50;
+        if (point.x < 0) point.x = 50;
+        if (point.y < 0) point.y = 50;
+        
+        // Adjust origin positions
+        point.originX = Math.min(point.originX, window.innerWidth);
+        point.originY = Math.min(point.originY, window.innerHeight);
+      });
+    };
+
+    // Regenerate particles with adaptive density
+    const regenerateParticles = () => {
+      points.length = 0; // Clear existing particles
+      
+      // Recalculate particle count based on screen size (adaptive density)
+      const particleCount = Math.floor((window.innerWidth * window.innerHeight) / 15000);
+      const gridSize = Math.sqrt(particleCount);
+      const jitter = 40;
+
+      for (let x = 0; x < window.innerWidth; x += window.innerWidth / gridSize) {
+        for (let y = 0; y < window.innerHeight; y += window.innerHeight / gridSize) {
+          if (Math.random() < 0.2) continue; // Skip 20% randomly
+
+          const jitterX = (Math.random() - 0.5) * jitter * 2;
+          const jitterY = (Math.random() - 0.5) * jitter * 2;
+
+          points.push({
+            x: x + jitterX,
+            y: y + jitterY,
+            originX: x + jitterX,
+            originY: y + jitterY,
+            vx: (Math.random() - 0.5) * 0.8,
+            vy: (Math.random() - 0.5) * 0.8,
+            opacity: 0.6 + Math.random() * 0.4,
+            targetOpacity: 0.6 + Math.random() * 0.4,
+            size: 1.5 + Math.random() * 1,
+            connections: [],
+          });
+        }
+      }
+    };
+
+    // Debounced resize handler
+    let resizeTimeout: NodeJS.Timeout;
+    const debouncedResize = () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        handleResize();
+        regenerateParticles();
+      }, 150);
+    };
+
+    window.addEventListener("resize", debouncedResize);
+
     // Mouse tracking for interaction
     const handleMouseMove = (event: MouseEvent) => {
       const rect = canvas.getBoundingClientRect();
@@ -195,33 +256,40 @@ export default function NFTMintingPage() {
 
       });
 
-      // Draw dynamic connections in real-time
-      for (let i = 0; i < points.length; i++) {
+      // Draw dynamic connections with max 3 connections per point
+      const maxConnectionsPerPoint = 3;
+      const maxDistance = 120;
+      const minOpacity = 0.1;
+      const maxOpacity = 0.6;
+
+      points.forEach((particle, i) => {
+        let connectionCount = 0;
+        
         for (let j = i + 1; j < points.length; j++) {
-          const point1 = points[i];
-          const point2 = points[j];
+          if (connectionCount >= maxConnectionsPerPoint) break;
           
-          const dx = point1.x - point2.x;
-          const dy = point1.y - point2.y;
+          const otherParticle = points[j];
+          const dx = particle.x - otherParticle.x;
+          const dy = particle.y - otherParticle.y;
           const distance = Math.sqrt(dx * dx + dy * dy);
 
-          // Only draw connection if within reasonable distance
-          if (distance < 85) {
-            // Variable opacity from 0.2 to 0.6 based on distance
-            const distanceRatio = distance / 85;
-            const lineOpacity = 0.6 - distanceRatio * 0.4;
+          if (distance < maxDistance) {
+            // Map distance to opacity
+            const distanceRatio = distance / maxDistance;
+            const lineOpacity = maxOpacity - distanceRatio * (maxOpacity - minOpacity);
 
-            if (lineOpacity > 0.15) {
+            if (lineOpacity > minOpacity) {
               ctx.beginPath();
-              ctx.moveTo(point1.x, point1.y);
-              ctx.lineTo(point2.x, point2.y);
+              ctx.moveTo(particle.x, particle.y);
+              ctx.lineTo(otherParticle.x, otherParticle.y);
               ctx.strokeStyle = `rgba(255, 255, 255, ${lineOpacity})`;
               ctx.lineWidth = 1;
               ctx.stroke();
+              connectionCount++;
             }
           }
         }
-      }
+      });
 
       animationFrameId = requestAnimationFrame(animate);
     };
@@ -229,7 +297,9 @@ export default function NFTMintingPage() {
     animate();
 
     return () => {
-      window.removeEventListener("resize", resizeCanvas);
+      window.removeEventListener("resize", debouncedResize);
+      canvas.removeEventListener("mousemove", handleMouseMove);
+      clearTimeout(resizeTimeout);
       if (animationFrameId) {
         cancelAnimationFrame(animationFrameId);
       }
