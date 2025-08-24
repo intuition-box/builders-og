@@ -58,6 +58,7 @@ export default function NFTMintingPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [networkError, setNetworkError] = useState<string>("");
   const [showNetworkInstructions, setShowNetworkInstructions] = useState(false);
+  const [userBalance, setUserBalance] = useState<string>("0");
 
   // Canvas animation ref
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -72,10 +73,18 @@ export default function NFTMintingPage() {
 
     // Set canvas size to full screen
     const resizeCanvas = () => {
+      // Store current canvas state
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      
       canvas.width = window.innerWidth * window.devicePixelRatio;
       canvas.height = window.innerHeight * window.devicePixelRatio;
       canvas.style.width = window.innerWidth + "px";
       canvas.style.height = window.innerHeight + "px";
+      
+      // Fill with black immediately to prevent flash
+      ctx.fillStyle = "black";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
       ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
     };
 
@@ -186,7 +195,7 @@ export default function NFTMintingPage() {
       resizeTimeout = setTimeout(() => {
         handleResize();
         regenerateParticles();
-      }, 50);
+      }, 100);
     };
 
     window.addEventListener("resize", debouncedResize);
@@ -205,7 +214,7 @@ export default function NFTMintingPage() {
     // Constellation animation loop
     const animate = () => {
       // Clear canvas with pure black background
-      ctx.fillStyle = "rgba(0, 0, 0, 1)";
+      ctx.fillStyle = "black";
       ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
 
       const mouseAttraction = 200; // Attraction radius
@@ -381,6 +390,8 @@ export default function NFTMintingPage() {
 
         console.log("[v0] Loading contract data...");
         await loadContractData(contract);
+        console.log("[v0] Loading user balance...");
+        await loadUserBalance(provider, accounts[0]);
         console.log("[v0] Loading user NFTs...");
         await loadUserNFTs(contract, accounts[0]);
         console.log("[v0] Wallet connection complete!");
@@ -413,6 +424,18 @@ export default function NFTMintingPage() {
       setTotalSupply(0);
       setMaxSupply(1000);
       setMintPrice("0");
+    }
+  };
+
+  const loadUserBalance = async (provider: ethers.BrowserProvider, userAddress: string) => {
+    try {
+      const balance = await provider.getBalance(userAddress);
+      const balanceInEth = ethers.formatEther(balance);
+      const formattedBalance = parseFloat(balanceInEth).toFixed(1);
+      setUserBalance(formattedBalance);
+    } catch (error) {
+      console.error("Error loading user balance:", error);
+      setUserBalance("0");
     }
   };
 
@@ -538,45 +561,59 @@ export default function NFTMintingPage() {
     setUserNFTs([]);
     setNetworkError("");
     setShowNetworkInstructions(false);
+    setUserBalance("0");
   };
 
   return (
     <div className="h-screen bg-black relative overflow-hidden">
+      {/* Black background to prevent white flash */}
+      <div className="fixed inset-0 bg-black z-0" />
       {/* Canvas animation background - matches DEX Intuition style */}
       <canvas
         ref={canvasRef}
         className="fixed inset-0 pointer-events-none z-0"
-        style={{ width: "100vw", height: "100vh" }}
+        style={{ width: "100vw", height: "100vh", backgroundColor: 'black' }}
       />
-      <header className="border-b border-white/10 sticky top-0 z-50" style={{height: '70px', background: 'rgba(0, 0, 0, 0.7)', backdropFilter: 'blur(12px)'}}>
-        <div className="w-full max-w-7xl mx-auto px-8 h-full">
+      <header className="fixed top-0 left-0 right-0 z-20 h-16 sm:h-18 lg:h-20">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
           <div className="flex items-center justify-between h-full">
-            <h1 className="text-xl font-bold text-white tracking-wide">
+            <h1 className="text-lg xs:text-xl font-bold text-white tracking-wide">
               GENESIS NFT
             </h1>
 
             {account ? (
-              <div className="flex items-center gap-2 sm:gap-3 lg:gap-4">
-                <Badge
-                  variant="secondary"
-                  className="px-2 sm:px-3 py-1 text-xs sm:text-sm hidden xs:flex"
+              <div 
+                onClick={disconnectWallet}
+                className="flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-1.5 sm:py-2 cursor-pointer transition-all rounded-xl hover:scale-105 bg-white/95 border border-black/10 text-gray-900 font-semibold text-xs sm:text-sm"
+              >
+                <span className="font-bold text-gray-900 hidden xs:inline">
+                  {userBalance} tTRUST
+                </span>
+                <div 
+                  className="flex items-center gap-1 sm:gap-2 pl-0 xs:pl-3 border-l-0 xs:border-l border-black/10"
                 >
-                  {`${account.slice(0, 6)}...${account.slice(-4)}`}
-                </Badge>
-                <Button
-                  variant="outline"
-                  onClick={disconnectWallet}
-                  size="sm"
-                  className="h-10 px-5 text-sm text-white border-white/30 hover:bg-white/10 rounded-lg"
-                >
-                  Disconnect
-                </Button>
+                  <div 
+                    className="w-4 sm:w-5 h-4 sm:h-5 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500"
+                  />
+                  <span className="text-gray-600 font-medium text-xs sm:text-sm">
+                    {`${account.slice(0, 3)}...${account.slice(-3)}`}
+                  </span>
+                  <svg 
+                    className="w-3 sm:w-4 h-3 sm:h-4" 
+                    viewBox="0 0 20 20" 
+                    fill="none" 
+                    stroke="#6b7280" 
+                    strokeWidth="2"
+                  >
+                    <path d="M5.25 7.5l4.25 4.25L13.75 7.5" />
+                  </svg>
+                </div>
               </div>
             ) : (
               <Button
                 onClick={connectWallet}
                 disabled={isConnecting}
-                className="flex items-center gap-2 h-10 px-5 text-sm bg-white/95 text-gray-900 hover:bg-white hover:shadow-lg hover:-translate-y-0.5 transition-all rounded-lg font-semibold"
+                className="flex items-center gap-2 h-9 sm:h-10 px-4 sm:px-5 text-xs sm:text-sm bg-white/95 text-gray-900 hover:bg-white hover:shadow-lg hover:-translate-y-0.5 transition-all rounded-lg font-semibold"
               >
                 {isConnecting ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -592,19 +629,19 @@ export default function NFTMintingPage() {
         </div>
       </header>
 
-      <main className="w-full max-w-5xl mx-auto px-4 sm:px-6 py-2 sm:py-4 relative z-10 h-full overflow-y-auto" style={{height: 'calc(100vh - 70px)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between'}}>
-        <div className="flex-1 flex flex-col justify-center">
-          <div className="text-center mb-8">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold mb-4 bg-gradient-to-br from-white to-slate-400 bg-clip-text text-transparent" style={{lineHeight: '1.1'}}>
+      <main className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 min-h-screen pt-20 sm:pt-24 lg:pt-28 pb-8">
+        <div className="space-y-8">
+          <div className="text-center">
+          <h2 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold mb-4 bg-gradient-to-br from-white to-slate-400 bg-clip-text text-transparent leading-tight">
             Hello Intuition Builder
           </h2>
-          <p className="text-base text-white/70 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-sm xs:text-base text-white/70 max-w-2xl mx-auto leading-relaxed">
             An early builder badge on the Intuition Network.
           </p>
         </div>
 
         {(networkError || showNetworkInstructions) && (
-          <div className="max-w-2xl mx-auto mb-8">
+          <div className="max-w-2xl mx-auto mb-6 sm:mb-8">
             <Card className="border-destructive/50 bg-destructive/5">
               <CardHeader>
                 <CardTitle className="text-red-400 flex items-center gap-2">
@@ -614,7 +651,7 @@ export default function NFTMintingPage() {
                 <CardDescription className="text-red-300">{networkError}</CardDescription>
               </CardHeader>
               {showNetworkInstructions && (
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-3 sm:space-y-4 p-0">
                   <div className="text-sm text-gray-400 space-y-2">
                     <p className="font-semibold">To manually add Intuition Testnet:</p>
                     <ol className="list-decimal list-inside space-y-1 text-gray-400">
@@ -649,40 +686,40 @@ export default function NFTMintingPage() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 relative z-10">
-          <Card className="text-center p-5 hover:backdrop-blur-xl transition-all duration-300 relative z-10" style={{background: 'rgba(15, 23, 42, 0.4)', border: '1px solid rgba(148, 163, 184, 0.2)', backdropFilter: 'blur(20px)', minHeight: '120px'}}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 xs:gap-4 sm:gap-5 lg:gap-6">
+          <Card className="text-center p-3 xs:p-4 sm:p-5 lg:p-6 hover:bg-white/10 transition-all duration-300 min-h-[90px] xs:min-h-[100px] sm:min-h-[120px] lg:min-h-[140px]" style={{background: '#1A1B1F', border: '1px solid rgba(255, 255, 255, 0.08)'}}>
             <CardHeader className="text-center p-0">
-              <CardTitle className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white mb-2">
+              <CardTitle className="text-xl xs:text-2xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold text-white mb-2">
                 {totalSupply}
               </CardTitle>
-              <CardDescription className="text-white/60 text-sm font-medium">Total Minted</CardDescription>
+              <CardDescription className="text-white/60 text-xs sm:text-sm font-medium">Total Minted</CardDescription>
             </CardHeader>
           </Card>
 
-          <Card className="text-center p-5 hover:backdrop-blur-xl transition-all duration-300 relative z-10" style={{background: 'rgba(15, 23, 42, 0.4)', border: '1px solid rgba(148, 163, 184, 0.2)', backdropFilter: 'blur(20px)', minHeight: '120px'}}>
+          <Card className="text-center p-3 xs:p-4 sm:p-5 lg:p-6 hover:bg-white/10 transition-all duration-300 min-h-[90px] xs:min-h-[100px] sm:min-h-[120px] lg:min-h-[140px]" style={{background: '#1A1B1F', border: '1px solid rgba(255, 255, 255, 0.08)'}}>
             <CardHeader className="text-center p-0">
-              <CardTitle className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white mb-2">
+              <CardTitle className="text-xl xs:text-2xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold text-white mb-2">
                 {maxSupply}
               </CardTitle>
-              <CardDescription className="text-white/60 text-sm font-medium">Max Supply</CardDescription>
+              <CardDescription className="text-white/60 text-xs sm:text-sm font-medium">Max Supply</CardDescription>
             </CardHeader>
           </Card>
 
-          <Card className="text-center p-5 hover:backdrop-blur-xl transition-all duration-300 relative z-10" style={{background: 'rgba(15, 23, 42, 0.4)', border: '1px solid rgba(148, 163, 184, 0.2)', backdropFilter: 'blur(20px)', minHeight: '120px'}}>
+          <Card className="text-center p-3 xs:p-4 sm:p-5 lg:p-6 hover:bg-white/10 transition-all duration-300 min-h-[90px] xs:min-h-[100px] sm:min-h-[120px] lg:min-h-[140px]" style={{background: '#1A1B1F', border: '1px solid rgba(255, 255, 255, 0.08)'}}>
             <CardHeader className="text-center p-0">
-              <CardTitle className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white mb-2">
+              <CardTitle className="text-xl xs:text-2xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold text-white mb-2">
                 {mintPrice === "0" ? "Free" : `${mintPrice} tTRUST`}
               </CardTitle>
-              <CardDescription className="text-white/60 text-sm font-medium">Mint Price</CardDescription>
+              <CardDescription className="text-white/60 text-xs sm:text-sm font-medium">Mint Price</CardDescription>
             </CardHeader>
           </Card>
         </div>
 
-        <div className="max-w-md mx-auto mb-6 relative z-10">
-          <Card className="p-8 relative z-10" style={{background: 'rgba(15, 23, 42, 0.4)', border: '1px solid rgba(148, 163, 184, 0.2)', backdropFilter: 'blur(20px)'}}>
-            <CardHeader className="text-center p-0 mb-6">
-              <CardTitle className="text-2xl font-bold text-white mb-3">Mint Your NFT</CardTitle>
-              <CardDescription className="text-white/70 text-base">
+        <div className="max-w-md mx-auto w-full">
+          <Card className="p-5 xs:p-6 sm:p-8" style={{background: '#1A1B1F', border: '1px solid rgba(255, 255, 255, 0.08)'}}>
+            <CardHeader className="text-center p-0 mb-4 sm:mb-6">
+              <CardTitle className="text-xl sm:text-2xl font-bold text-white mb-3">Mint Your NFT</CardTitle>
+              <CardDescription className="text-white/70 text-sm sm:text-base">
                 {account ? "Ready to mint your unique NFT" : "Connect your wallet to get started"}
               </CardDescription>
             </CardHeader>
@@ -697,7 +734,7 @@ export default function NFTMintingPage() {
                 <Button
                   onClick={mintNFT}
                   disabled={isMinting || totalSupply >= maxSupply || !!networkError}
-                  className="w-full h-14 text-base font-semibold bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/10 hover:border-blue-500/50 hover:-translate-y-1 transition-all rounded-xl"
+                  className="w-full h-12 sm:h-14 text-sm sm:text-base font-semibold bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/10 hover:border-blue-500/50 hover:-translate-y-1 transition-all rounded-xl"
                 >
                   {isMinting ? (
                     <>
@@ -714,7 +751,7 @@ export default function NFTMintingPage() {
                 <Button
                   onClick={connectWallet}
                   disabled={isConnecting}
-                  className="w-full h-14 text-base font-semibold bg-white/95 text-gray-900 hover:bg-white hover:-translate-y-1 transition-all rounded-xl"
+                  className="w-full h-12 sm:h-14 text-sm sm:text-base font-semibold bg-white/95 text-gray-900 hover:bg-white hover:-translate-y-1 transition-all rounded-xl"
                 >
                   {isConnecting ? (
                     <>
@@ -734,20 +771,20 @@ export default function NFTMintingPage() {
         </div>
 
         {account && (
-          <div>
-            <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-serif font-bold text-white text-center mb-6 sm:mb-8 lg:mb-12">
+          <div className="mt-8">
+            <h3 className="text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl font-serif font-bold text-white text-center mb-4 sm:mb-6 lg:mb-8">
               Your NFT Collection
             </h3>
 
             {isLoading ? (
-              <div className="flex justify-center items-center py-8 sm:py-12 lg:py-16">
+              <div className="flex justify-center items-center py-6 sm:py-8 lg:py-12">
                 <Loader2 className="h-6 w-6 sm:h-8 sm:w-8 animate-spin" />
-                <span className="ml-2 text-sm sm:text-base text-gray-400">
+                <span className="ml-2 text-xs sm:text-sm text-gray-400">
                   Loading your NFTs...
                 </span>
               </div>
             ) : userNFTs.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6 lg:gap-8 relative z-10">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 xs:gap-3 sm:gap-4 lg:gap-5">
                 {userNFTs.map((nft) => (
                   <Card
                     key={nft.tokenId}
@@ -760,14 +797,14 @@ export default function NFTMintingPage() {
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                       />
                     </div>
-                    <CardContent className="p-3 sm:p-4 lg:p-5">
-                      <h4 className="font-serif font-bold text-sm sm:text-base lg:text-lg text-white mb-1 sm:mb-2 truncate">
+                    <CardContent className="p-2 xs:p-3 sm:p-4">
+                      <h4 className="font-serif font-bold text-xs xs:text-sm sm:text-base text-white mb-1 truncate">
                         {nft.metadata.name}
                       </h4>
-                      <p className="text-xs sm:text-sm text-gray-400 line-clamp-2 mb-2 sm:mb-3">
+                      <p className="text-xs text-gray-400 line-clamp-2 mb-1 xs:mb-2 hidden xs:block">
                         {nft.metadata.description}
                       </p>
-                      <Badge variant="outline" className="text-xs text-gray-400 border-gray-500">
+                      <Badge variant="outline" className="text-xs text-gray-400 border-gray-500 px-1 xs:px-2">
                         #{nft.tokenId}
                       </Badge>
                     </CardContent>
@@ -775,12 +812,12 @@ export default function NFTMintingPage() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8 sm:py-12 lg:py-16">
-                <ImageIcon className="h-12 w-12 sm:h-16 sm:w-16 text-gray-400 mx-auto mb-3 sm:mb-4" />
-                <h4 className="text-lg sm:text-xl font-serif font-bold text-white mb-2">
+              <div className="text-center py-6 xs:py-8 sm:py-12 lg:py-16">
+                <ImageIcon className="h-10 w-10 xs:h-12 xs:w-12 sm:h-16 sm:w-16 text-gray-400 mx-auto mb-3 sm:mb-4" />
+                <h4 className="text-base xs:text-lg sm:text-xl font-serif font-bold text-white mb-2">
                   No NFTs Yet
                 </h4>
-                <p className="text-sm sm:text-base text-gray-400 max-w-md mx-auto">
+                <p className="text-xs xs:text-sm sm:text-base text-gray-400 max-w-md mx-auto px-4">
                   Mint your first NFT to see it appear in your collection!
                 </p>
               </div>
@@ -788,13 +825,13 @@ export default function NFTMintingPage() {
           </div>
         )}
         </div>
-      </main>
 
-      <footer className="text-center py-4 relative z-10">
-        <p className="text-sm text-gray-400">
+        <footer className="w-full text-center py-8 mt-12">
+        <p className="text-xs sm:text-sm text-gray-400">
           Built with React, Ethers.js, and modern Web3 technologies
         </p>
-      </footer>
+        </footer>
+      </main>
     </div>
   );
 }
