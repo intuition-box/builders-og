@@ -292,8 +292,8 @@ export default function NFTMintingPage() {
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 bg-blue-950">
-          <div className="flex items-center justify-between bg-blue-950 text-white">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 py-4">
+          <div className="flex items-center justify-between">
             <h1 className="text-2xl font-serif font-black text-card-foreground">GENESIS NFT</h1>
 
             {account ? (
@@ -315,7 +315,7 @@ export default function NFTMintingPage() {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8 bg-blue-950 text-white">
+      <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 py-8 sm:py-12 lg:py-16">
         <div className="text-center mb-12">
           <h2 className="text-4xl md:text-6xl font-serif font-black text-foreground mb-4">Hello Intuition Builder</h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto italic">
@@ -369,7 +369,7 @@ export default function NFTMintingPage() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 xl:gap-10 mb-8 sm:mb-12 lg:mb-16">
           <Card>
             <CardHeader className="text-center">
               <CardTitle className="text-2xl font-serif font-bold text-card-foreground">{totalSupply}</CardTitle>
@@ -461,7 +461,7 @@ export default function NFTMintingPage() {
                 <span className="ml-2">Loading your NFTs...</span>
               </div>
             ) : userNFTs.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6 lg:gap-8">
                 {userNFTs.map((nft) => (
                   <Card key={nft.tokenId} className="overflow-hidden hover:shadow-lg transition-shadow">
                     <div className="aspect-square relative">
@@ -493,7 +493,7 @@ export default function NFTMintingPage() {
       </main>
 
       <footer className="border-t border-border mt-16">
-        <div className="container mx-auto px-4 py-8 text-center">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 py-8 sm:py-12 text-center">
           <p className="text-muted-foreground">Built with React, Ethers.js, and modern Web3 technologies</p>
         </div>
       </footer>

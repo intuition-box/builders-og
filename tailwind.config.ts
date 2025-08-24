@@ -12,6 +12,32 @@ const config: Config = {
   ],
   theme: {
   	extend: {
+  		// Enhanced responsive breakpoints for multi-device compatibility
+  		screens: {
+  			'xs': '320px',   // Extra small devices (iPhone SE)
+  			'sm': '640px',   // Small devices (large phones)
+  			'md': '768px',   // Medium devices (tablets)  
+  			'lg': '1024px',  // Large devices (laptops)
+  			'xl': '1280px',  // Extra large devices (desktops)
+  			'2xl': '1536px', // 2X large devices (large desktops)
+  		},
+  		// Container max-widths for optimal readability
+  		container: {
+  			center: true,
+  			padding: {
+  				DEFAULT: '1rem',    // 16px base padding
+  				sm: '1.5rem',       // 24px on small screens
+  				lg: '2rem',         // 32px on large screens  
+  				xl: '2.5rem',       // 40px on extra large screens
+  			},
+  			screens: {
+  				sm: '640px',
+  				md: '768px', 
+  				lg: '1024px',
+  				xl: '1280px',
+  				'2xl': '1400px',    // Prevent over-stretching on large displays
+  			},
+  		},
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
