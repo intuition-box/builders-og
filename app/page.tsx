@@ -454,28 +454,28 @@ export default function NFTMintingPage() {
 
         {account && (
           <div>
-            <h3 className="text-3xl font-serif font-bold text-center mb-8">Your NFT Collection</h3>
+            <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-serif font-bold text-center mb-6 sm:mb-8 lg:mb-12">Your NFT Collection</h3>
 
             {isLoading ? (
-              <div className="flex justify-center items-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin" />
-                <span className="ml-2">Loading your NFTs...</span>
+              <div className="flex justify-center items-center py-8 sm:py-12 lg:py-16">
+                <Loader2 className="h-6 w-6 sm:h-8 sm:w-8 animate-spin" />
+                <span className="ml-2 text-sm sm:text-base">Loading your NFTs...</span>
               </div>
             ) : userNFTs.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6 lg:gap-8">
                 {userNFTs.map((nft) => (
-                  <Card key={nft.tokenId} className="overflow-hidden hover:shadow-lg transition-shadow">
-                    <div className="aspect-square relative">
+                  <Card key={nft.tokenId} className="overflow-hidden hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer group">
+                    <div className="aspect-square relative overflow-hidden">
                       <img
                         src={nft.metadata.image || "/placeholder.svg"}
                         alt={nft.metadata.name}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                       />
                     </div>
-                    <CardContent className="p-4">
-                      <h4 className="font-serif font-bold text-lg mb-2">{nft.metadata.name}</h4>
-                      <p className="text-sm text-muted-foreground">{nft.metadata.description}</p>
-                      <Badge variant="outline" className="mt-2">
+                    <CardContent className="p-3 sm:p-4 lg:p-5">
+                      <h4 className="font-serif font-bold text-sm sm:text-base lg:text-lg mb-1 sm:mb-2 truncate">{nft.metadata.name}</h4>
+                      <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 mb-2 sm:mb-3">{nft.metadata.description}</p>
+                      <Badge variant="outline" className="text-xs">
                         #{nft.tokenId}
                       </Badge>
                     </CardContent>
@@ -483,10 +483,10 @@ export default function NFTMintingPage() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-12">
-                <ImageIcon className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                <h4 className="text-xl font-serif font-bold mb-2">No NFTs Yet</h4>
-                <p className="text-muted-foreground">Mint your first NFT to see it appear in your collection!</p>
+              <div className="text-center py-8 sm:py-12 lg:py-16">
+                <ImageIcon className="h-12 w-12 sm:h-16 sm:w-16 text-muted-foreground mx-auto mb-3 sm:mb-4" />
+                <h4 className="text-lg sm:text-xl font-serif font-bold mb-2">No NFTs Yet</h4>
+                <p className="text-sm sm:text-base text-muted-foreground max-w-md mx-auto">Mint your first NFT to see it appear in your collection!</p>
               </div>
             )}
           </div>
