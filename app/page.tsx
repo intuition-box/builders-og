@@ -61,11 +61,9 @@ export default function NFTMintingPage() {
   const [userBalance, setUserBalance] = useState<string>("0");
   const [showDropdown, setShowDropdown] = useState(false);
 
-  // Canvas animation ref
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -85,9 +83,7 @@ export default function NFTMintingPage() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Set canvas size to full screen
     const resizeCanvas = () => {
-      // Store current canvas state
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
       canvas.width = window.innerWidth * window.devicePixelRatio;
@@ -95,7 +91,6 @@ export default function NFTMintingPage() {
       canvas.style.width = window.innerWidth + "px";
       canvas.style.height = window.innerHeight + "px";
 
-      // Fill with black immediately to prevent flash
       ctx.fillStyle = "black";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -104,7 +99,6 @@ export default function NFTMintingPage() {
 
     resizeCanvas();
 
-    // Constellation grid system - DEX Intuition style
     const points: Array<{
       x: number;
       y: number;
@@ -121,66 +115,13 @@ export default function NFTMintingPage() {
     let mouseX = 0;
     let mouseY = 0;
 
-    // Create constellation grid with cluster distribution
     const createConstellationGrid = () => {
       const gridSize = 12; // 12x12 grid (further reduced density)
       const jitter = 40; // ±40px randomization (increased)
 
       for (let x = 0; x < window.innerWidth; x += window.innerWidth / gridSize) {
         for (let y = 0; y < window.innerHeight; y += window.innerHeight / gridSize) {
-          // Create breathing zones - skip 30% of points randomly (increased)
           if (Math.random() < 0.3) continue;
-
-          const jitterX = (Math.random() - 0.5) * jitter * 2;
-          const jitterY = (Math.random() - 0.5) * jitter * 2;
-
-          points.push({
-            x: x + jitterX,
-            y: y + jitterY,
-            originX: x + jitterX,
-            originY: y + jitterY,
-            vx: (Math.random() - 0.5) * 0.8, // Constant velocity between -0.4 and +0.4
-            vy: (Math.random() - 0.5) * 0.8, // Constant velocity between -0.4 and +0.4
-            opacity: 0.6 + Math.random() * 0.4,
-            targetOpacity: 0.6 + Math.random() * 0.4,
-            size: 1.5 + Math.random() * 1,
-            connections: [],
-          });
-        }
-      }
-    };
-
-    createConstellationGrid();
-
-    // Handle resize with particle repositioning
-    const handleResize = () => {
-      resizeCanvas();
-
-      // Reposition existing particles to stay within bounds
-      points.forEach((point) => {
-        if (point.x > window.innerWidth) point.x = window.innerWidth - 50;
-        if (point.y > window.innerHeight) point.y = window.innerHeight - 50;
-        if (point.x < 0) point.x = 50;
-        if (point.y < 0) point.y = 50;
-
-        // Adjust origin positions
-        point.originX = Math.min(point.originX, window.innerWidth);
-        point.originY = Math.min(point.originY, window.innerHeight);
-      });
-    };
-
-    // Regenerate particles with adaptive density
-    const regenerateParticles = () => {
-      points.length = 0; // Clear existing particles
-
-      // Recalculate particle count based on screen size (reduced density)
-      const particleCount = Math.floor((window.innerWidth * window.innerHeight) / 20000); // Reduced density
-      const gridSize = Math.sqrt(particleCount);
-      const jitter = 40;
-
-      for (let x = 0; x < window.innerWidth; x += window.innerWidth / gridSize) {
-        for (let y = 0; y < window.innerHeight; y += window.innerHeight / gridSize) {
-          if (Math.random() < 0.2) continue; // Skip 20% randomly
 
           const jitterX = (Math.random() - 0.5) * jitter * 2;
           const jitterY = (Math.random() - 0.5) * jitter * 2;
@@ -201,7 +142,52 @@ export default function NFTMintingPage() {
       }
     };
 
-    // Debounced resize handler
+    createConstellationGrid();
+
+    const handleResize = () => {
+      resizeCanvas();
+
+      points.forEach((point) => {
+        if (point.x > window.innerWidth) point.x = window.innerWidth - 50;
+        if (point.y > window.innerHeight) point.y = window.innerHeight - 50;
+        if (point.x < 0) point.x = 50;
+        if (point.y < 0) point.y = 50;
+
+        point.originX = Math.min(point.originX, window.innerWidth);
+        point.originY = Math.min(point.originY, window.innerHeight);
+      });
+    };
+
+    const regenerateParticles = () => {
+      points.length = 0;
+
+      const particleCount = Math.floor((window.innerWidth * window.innerHeight) / 20000);
+      const gridSize = Math.sqrt(particleCount);
+      const jitter = 40;
+
+      for (let x = 0; x < window.innerWidth; x += window.innerWidth / gridSize) {
+        for (let y = 0; y < window.innerHeight; y += window.innerHeight / gridSize) {
+          if (Math.random() < 0.2) continue;
+
+          const jitterX = (Math.random() - 0.5) * jitter * 2;
+          const jitterY = (Math.random() - 0.5) * jitter * 2;
+
+          points.push({
+            x: x + jitterX,
+            y: y + jitterY,
+            originX: x + jitterX,
+            originY: y + jitterY,
+            vx: (Math.random() - 0.5) * 0.8,
+            vy: (Math.random() - 0.5) * 0.8,
+            opacity: 0.6 + Math.random() * 0.4,
+            targetOpacity: 0.6 + Math.random() * 0.4,
+            size: 1.5 + Math.random() * 1,
+            connections: [],
+          });
+        }
+      }
+    };
+
     let resizeTimeout: NodeJS.Timeout;
     const debouncedResize = () => {
       clearTimeout(resizeTimeout);
@@ -213,7 +199,6 @@ export default function NFTMintingPage() {
 
     window.addEventListener("resize", debouncedResize);
 
-    // Mouse tracking for interaction
     const handleMouseMove = (event: MouseEvent) => {
       const rect = canvas.getBoundingClientRect();
       mouseX = event.clientX - rect.left;
@@ -224,16 +209,13 @@ export default function NFTMintingPage() {
 
     let animationFrameId: number;
 
-    // Constellation animation loop
     const animate = () => {
-      // Clear canvas with pure black background
       ctx.fillStyle = "black";
       ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
 
       const mouseAttraction = 200; // Attraction radius
 
       points.forEach((point, index) => {
-        // Calculate mouse interaction
         const dx = mouseX - point.x;
         const dy = mouseY - point.y;
         const mouseDistance = Math.sqrt(dx * dx + dy * dy);
@@ -241,25 +223,21 @@ export default function NFTMintingPage() {
         let attractionX = 0;
         let attractionY = 0;
 
-        // Mouse attraction within radius
         if (mouseDistance < mouseAttraction && mouseDistance > 0) {
           const attractionStrength = 1 - mouseDistance / mouseAttraction;
           attractionX = (dx / mouseDistance) * attractionStrength * 2;
           attractionY = (dy / mouseDistance) * attractionStrength * 2;
         }
 
-        // Apply continuous movement with constant velocity
         point.x += point.vx;
         point.y += point.vy;
 
-        // Add slight mouse attraction without disrupting continuous flow
         if (mouseDistance < mouseAttraction && mouseDistance > 0) {
           const attractionStrength = 1 - mouseDistance / mouseAttraction;
           point.vx += attractionX * attractionStrength * 0.002;
           point.vy += attractionY * attractionStrength * 0.002;
         }
 
-        // Bounce physics on screen edges instead of wrapping
         if (point.x < 0 || point.x > window.innerWidth) {
           point.vx *= -1;
           point.x = Math.max(0, Math.min(window.innerWidth, point.x));
@@ -269,18 +247,16 @@ export default function NFTMintingPage() {
           point.y = Math.max(0, Math.min(window.innerHeight, point.y));
         }
 
-        // Draw point
         ctx.beginPath();
         ctx.arc(point.x, point.y, point.size, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(255, 255, 255, ${point.opacity})`;
         ctx.fill();
       });
 
-      // Draw dynamic connections with max 2 connections per point (reduced)
       const maxConnectionsPerPoint = 2;
-      const maxDistance = 100; // Reduced distance
+      const maxDistance = 100;
       const minOpacity = 0.1;
-      const maxOpacity = 0.4; // Reduced max opacity
+      const maxOpacity = 0.4;
 
       points.forEach((particle, i) => {
         let connectionCount = 0;
@@ -294,8 +270,7 @@ export default function NFTMintingPage() {
           const distance = Math.sqrt(dx * dx + dy * dy);
 
           if (distance < maxDistance) {
-            // Map distance to opacity
-            const distanceRatio = distance / maxDistance;
+              const distanceRatio = distance / maxDistance;
             const lineOpacity = maxOpacity - distanceRatio * (maxOpacity - minOpacity);
 
             if (lineOpacity > minOpacity) {
@@ -327,44 +302,31 @@ export default function NFTMintingPage() {
   }, []);
 
   const connectWallet = async () => {
-    console.log("[v0] Starting wallet connection process...");
 
     if (typeof window.ethereum === "undefined") {
-      console.log("[v0] window.ethereum is undefined - no Web3 wallet detected");
       setNetworkError("Please install MetaMask or another Web3 wallet!");
       return;
     }
 
-    console.log("[v0] Web3 wallet detected, proceeding with connection...");
     setIsConnecting(true);
     setNetworkError("");
 
     try {
-      console.log("[v0] Requesting current chain ID...");
       const chainId = await window.ethereum.request({ method: "eth_chainId" });
-      console.log("[v0] Current wallet chain ID:", chainId);
-      console.log("[v0] Expected chain ID:", INTUITION_TESTNET.chainId);
-      console.log("[v0] Chain ID match:", chainId === INTUITION_TESTNET.chainId);
 
       if (chainId !== INTUITION_TESTNET.chainId) {
-        console.log("[v0] Chain ID mismatch - attempting to switch networks");
         try {
-          console.log("[v0] Attempting wallet_switchEthereumChain...");
           await window.ethereum.request({
             method: "wallet_switchEthereumChain",
             params: [{ chainId: INTUITION_TESTNET.chainId }],
           });
-          console.log("[v0] Successfully switched to Intuition testnet");
         } catch (switchError: any) {
-          console.log("[v0] Switch error:", switchError);
           if (switchError.code === 4902) {
-            console.log("[v0] Network not found, attempting to add it...");
             try {
               await window.ethereum.request({
                 method: "wallet_addEthereumChain",
                 params: [INTUITION_TESTNET],
               });
-              console.log("[v0] Successfully added Intuition testnet");
             } catch (addError) {
               console.error("[v0] Error adding network:", addError);
               setNetworkError("Failed to add Intuition testnet automatically.");
@@ -382,15 +344,11 @@ export default function NFTMintingPage() {
         }
       }
 
-      console.log("[v0] Creating ethers provider...");
       const provider = new ethers.BrowserProvider(window.ethereum);
-      console.log("[v0] Provider created, requesting accounts...");
 
       const accounts = await provider.send("eth_requestAccounts", []);
-      console.log("[v0] Accounts received:", accounts);
 
       if (accounts.length > 0) {
-        console.log("[v0] Setting up account and contract...");
         setAccount(accounts[0]);
         setProvider(provider);
         setNetworkError("");
@@ -400,15 +358,10 @@ export default function NFTMintingPage() {
         const contract = new ethers.Contract(NFT_CONTRACT_ADDRESS, NFT_CONTRACT_ABI, signer);
         setContract(contract);
 
-        console.log("[v0] Loading contract data...");
         await loadContractData(contract);
-        console.log("[v0] Loading user balance...");
         await loadUserBalance(provider, accounts[0]);
-        console.log("[v0] Loading user NFTs...");
         await loadUserNFTs(contract, accounts[0]);
-        console.log("[v0] Wallet connection complete!");
       } else {
-        console.log("[v0] No accounts returned from wallet");
         setNetworkError("No accounts found. Please unlock your wallet.");
       }
     } catch (error) {
@@ -467,7 +420,6 @@ export default function NFTMintingPage() {
           if (owner.toLowerCase() === userAddress.toLowerCase()) {
             try {
               const tokenURI = await contract.tokenURI(tokenId);
-              console.log("[v0] Token URI for", tokenId, ":", tokenURI);
 
               let metadata: NFTMetadata;
 
@@ -476,7 +428,6 @@ export default function NFTMintingPage() {
                 const response = await fetch(tokenURI);
                 metadata = await response.json();
               } else {
-                // Fallback for non-HTTP URIs
                 metadata = {
                   name: `Genesis NFT #${tokenId}`,
                   description: `Intuition Network early builder badge #${tokenId}`,
@@ -486,8 +437,7 @@ export default function NFTMintingPage() {
 
               nfts.push({ tokenId: Number(tokenId), metadata });
             } catch (metadataError) {
-              console.error("[v0] Error fetching metadata for token", tokenId, ":", metadataError);
-              // Add NFT with basic info even if metadata fails
+              console.error("Error fetching metadata for token", tokenId, ":", metadataError);
               nfts.push({
                 tokenId: Number(tokenId),
                 metadata: {
@@ -499,14 +449,13 @@ export default function NFTMintingPage() {
             }
           }
         } catch (ownerError) {
-          // Token might not exist or other error, skip it
           continue;
         }
       }
 
       setUserNFTs(nfts);
     } catch (error) {
-      console.error("[v0] Error loading user NFTs:", error);
+      console.error("Error loading user NFTs:", error);
       setUserNFTs([]);
     } finally {
       setIsLoading(false);
@@ -523,7 +472,6 @@ export default function NFTMintingPage() {
     setNetworkError("");
 
     try {
-      console.log("[v0] Starting mint process...");
 
       const hasMinted = await contract.hasMinted(account);
       if (hasMinted) {
@@ -539,18 +487,14 @@ export default function NFTMintingPage() {
 
       const tx = await contract.mint();
 
-      console.log("[v0] Transaction sent:", tx.hash);
-      console.log("[v0] Waiting for confirmation...");
 
       await tx.wait();
-      console.log("[v0] Transaction confirmed!");
 
       await loadContractData(contract);
       await loadUserNFTs(contract, account);
 
-      console.log("[v0] Mint completed successfully!");
     } catch (error: any) {
-      console.error("[v0] Error minting NFT:", error);
+      console.error("Error minting NFT:", error);
 
       if (error.code === "INSUFFICIENT_FUNDS") {
         setNetworkError("Insufficient funds for transaction");
