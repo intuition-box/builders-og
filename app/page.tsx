@@ -34,6 +34,31 @@ const INTUITION_TESTNET = {
   blockExplorerUrls: ["https://testnet.explorer.intuition.systems"],
 };
 
+const GLASSMORPHISM_STYLE = {
+  background: "rgba(255, 255, 255, 0.15)",
+  boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
+  backdropFilter: "blur(8.7px)",
+  WebkitBackdropFilter: "blur(8.7px)",
+};
+
+const GLASSMORPHISM_DROPDOWN_STYLE = {
+  background: "rgba(255, 255, 255, 0.95)",
+  backdropFilter: "blur(10px)",
+  WebkitBackdropFilter: "blur(10px)",
+  border: "1px solid rgba(255, 255, 255, 0.2)"
+};
+
+const GLASSMORPHISM_ERROR_STYLE = {
+  background: "rgba(255, 255, 255, 0.08)",
+  boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
+  backdropFilter: "blur(6.0px)",
+  WebkitBackdropFilter: "blur(6.0px)",
+};
+
+const TITLE_CLASSES = "text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl font-serif font-bold text-white text-center mb-8";
+const BUTTON_PRIMARY_CLASSES = "w-full h-14 sm:h-16 text-base sm:text-lg font-semibold bg-white/95 text-gray-900 hover:bg-white hover:-translate-y-1 transition-all rounded-xl";
+const BUTTON_SECONDARY_CLASSES = "w-full h-12 sm:h-14 text-sm sm:text-base font-semibold";
+
 interface NFTMetadata {
   name: string;
   description: string;
@@ -556,12 +581,7 @@ export default function NFTMintingPage() {
                 {/* Dropdown Menu */}
                 {showDropdown && (
                   <div className="absolute top-full right-0 mt-2 w-full rounded-lg shadow-lg z-50"
-                       style={{
-                         background: "rgba(255, 255, 255, 0.95)",
-                         backdropFilter: "blur(10px)",
-                         WebkitBackdropFilter: "blur(10px)",
-                         border: "1px solid rgba(255, 255, 255, 0.2)"
-                       }}>
+                       style={GLASSMORPHISM_DROPDOWN_STYLE}>
                     <div className="py-2">
                       <button 
                         onClick={() => {
@@ -632,12 +652,7 @@ export default function NFTMintingPage() {
               <div className="max-w-2xl mx-auto mb-6 sm:mb-8">
                 <Card
                   className="border-red-500/50 rounded-2xl"
-                  style={{
-                    background: "rgba(255, 255, 255, 0.08)",
-                    boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
-                    backdropFilter: "blur(6.0px)",
-                    WebkitBackdropFilter: "blur(6.0px)",
-                  }}
+                  style={GLASSMORPHISM_ERROR_STYLE}
                 >
                   <CardHeader>
                     <CardTitle className="text-red-400 flex items-center gap-2">
@@ -686,18 +701,13 @@ export default function NFTMintingPage() {
             {/* Mint card - only show when wallet not connected */}
             {!account && (
               <div>
-                <h3 className="text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl font-serif font-bold text-white text-center mb-8">
+                <h3 className={TITLE_CLASSES}>
                   Mint Your NFT
                 </h3>
                 <div className="max-w-lg mx-auto w-full mb-6">
                   <Card
                     className="p-6 sm:p-8 lg:p-10 rounded-2xl border-0"
-                    style={{
-                      background: "rgba(255, 255, 255, 0.15)",
-                      boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
-                      backdropFilter: "blur(8.7px)",
-                      WebkitBackdropFilter: "blur(8.7px)",
-                    }}
+                    style={GLASSMORPHISM_STYLE}
                   >
                     <CardHeader className="text-center p-0 mb-6">
                       <CardDescription className="text-white/70 text-base sm:text-lg">
@@ -708,7 +718,7 @@ export default function NFTMintingPage() {
                     <Button
                       onClick={connectWallet}
                       disabled={isConnecting}
-                      className="w-full h-14 sm:h-16 text-base sm:text-lg font-semibold bg-white/95 text-gray-900 hover:bg-white hover:-translate-y-1 transition-all rounded-xl"
+                      className={BUTTON_PRIMARY_CLASSES}
                     >
                       {isConnecting ? (
                         <>
@@ -733,12 +743,7 @@ export default function NFTMintingPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mx-auto w-full">
                 <Card
                   className="text-center p-5 sm:p-6 hover:bg-white/5 transition-all duration-300 rounded-2xl border-0"
-                  style={{
-                    background: "rgba(255, 255, 255, 0.15)",
-                    boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
-                    backdropFilter: "blur(8.7px)",
-                    WebkitBackdropFilter: "blur(8.7px)",
-                  }}
+                  style={GLASSMORPHISM_STYLE}
                 >
                   <CardHeader className="text-center p-0">
                     <CardTitle className="text-xl sm:text-2xl font-extrabold text-white mb-2">
@@ -752,12 +757,7 @@ export default function NFTMintingPage() {
 
                 <Card
                   className="text-center p-5 sm:p-6 hover:bg-white/5 transition-all duration-300 rounded-2xl border-0"
-                  style={{
-                    background: "rgba(255, 255, 255, 0.15)",
-                    boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
-                    backdropFilter: "blur(8.7px)",
-                    WebkitBackdropFilter: "blur(8.7px)",
-                  }}
+                  style={GLASSMORPHISM_STYLE}
                 >
                   <CardHeader className="text-center p-0">
                     <CardTitle className="text-xl sm:text-2xl font-extrabold text-white mb-2">
@@ -778,18 +778,13 @@ export default function NFTMintingPage() {
               {/* Mint interface when connected but no NFTs */}
               {userNFTs.length === 0 && (
                 <div>
-                  <h3 className="text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl font-serif font-bold text-white text-center mb-8">
+                  <h3 className={TITLE_CLASSES}>
                     Mint Your NFT
                   </h3>
                   <div className="max-w-md mx-auto w-full mb-20">
                     <Card
                       className="p-5 xs:p-6 sm:p-8 rounded-2xl border-0"
-                      style={{
-                        background: "rgba(255, 255, 255, 0.15)",
-                        boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
-                        backdropFilter: "blur(8.7px)",
-                        WebkitBackdropFilter: "blur(8.7px)",
-                      }}
+                      style={GLASSMORPHISM_STYLE}
                     >
                       <CardHeader className="text-center p-0 mb-4 sm:mb-6">
                         <CardDescription className="text-white/70 text-sm sm:text-base">
@@ -828,7 +823,7 @@ export default function NFTMintingPage() {
               {/* Collection when user has NFTs */}
               {userNFTs.length > 0 && (
                 <div>
-                  <h3 className="text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl font-serif font-bold text-white text-center mb-8">
+                  <h3 className={TITLE_CLASSES}>
                     Your NFT
                   </h3>
 
@@ -846,12 +841,7 @@ export default function NFTMintingPage() {
                           <Card
                             key={nft.tokenId}
                             className="hover:scale-[1.02] transition-all duration-300 cursor-pointer group hover:bg-white/5 relative z-10 overflow-hidden rounded-2xl border-0"
-                            style={{
-                              background: "rgba(255, 255, 255, 0.15)",
-                              boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
-                              backdropFilter: "blur(8.7px)",
-                              WebkitBackdropFilter: "blur(8.7px)",
-                            }}
+                            style={GLASSMORPHISM_STYLE}
                           >
                             <div className="aspect-square relative overflow-hidden bg-gray-800">
                               <img
