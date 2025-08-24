@@ -371,21 +371,21 @@ export default function NFTMintingPage() {
         )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 xl:gap-10 mb-8 sm:mb-12 lg:mb-16">
-          <Card>
+          <Card className="backdrop-blur-sm bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20 hover:scale-105 transition-all duration-300 cursor-pointer">
             <CardHeader className="text-center">
               <CardTitle className="text-2xl font-serif font-bold text-card-foreground">{totalSupply}</CardTitle>
               <CardDescription>Total Minted</CardDescription>
             </CardHeader>
           </Card>
 
-          <Card>
+          <Card className="backdrop-blur-sm bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20 hover:scale-105 transition-all duration-300 cursor-pointer">
             <CardHeader className="text-center">
               <CardTitle className="text-2xl font-serif font-bold text-card-foreground">{maxSupply}</CardTitle>
               <CardDescription>Max Supply</CardDescription>
             </CardHeader>
           </Card>
 
-          <Card>
+          <Card className="backdrop-blur-sm bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20 hover:scale-105 transition-all duration-300 cursor-pointer">
             <CardHeader className="text-center">
               <CardTitle className="text-2xl font-serif font-bold text-card-foreground">
                 {mintPrice === "0" ? "Free" : `${mintPrice} tTRUST`}
