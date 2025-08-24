@@ -317,9 +317,9 @@ export default function NFTMintingPage() {
       </header>
 
       <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 py-8 sm:py-12 lg:py-16">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-6xl font-serif font-black text-foreground mb-4">Hello Intuition Builder</h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto italic">
+        <div className="text-center mb-8 sm:mb-12 lg:mb-16 xl:mb-20">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-serif font-black text-foreground mb-3 sm:mb-4 md:mb-5 lg:mb-6">Hello Intuition Builder</h2>
+          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground max-w-sm sm:max-w-lg md:max-w-2xl lg:max-w-3xl xl:max-w-4xl mx-auto italic leading-relaxed">
             An early builder badge on the Intuition Network.
           </p>
         </div>
