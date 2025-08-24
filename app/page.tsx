@@ -80,7 +80,6 @@ export default function NFTMintingPage() {
     };
 
     resizeCanvas();
-    window.addEventListener("resize", resizeCanvas);
 
     // Constellation grid system - DEX Intuition style
     const points: Array<{
@@ -187,7 +186,7 @@ export default function NFTMintingPage() {
       resizeTimeout = setTimeout(() => {
         handleResize();
         regenerateParticles();
-      }, 150);
+      }, 50);
     };
 
     window.addEventListener("resize", debouncedResize);
