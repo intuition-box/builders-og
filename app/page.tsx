@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ethers } from "ethers";
-import { ImageIcon, Loader2, Wallet } from "lucide-react";
+import { ImageIcon, Loader2, Wallet, Copy, ExternalLink, LogOut, ChevronDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 const NFT_CONTRACT_ABI = [
@@ -59,9 +59,23 @@ export default function NFTMintingPage() {
   const [networkError, setNetworkError] = useState<string>("");
   const [showNetworkInstructions, setShowNetworkInstructions] = useState(false);
   const [userBalance, setUserBalance] = useState<string>("0");
+  const [showDropdown, setShowDropdown] = useState(false);
 
   // Canvas animation ref
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Particle animation system - DEX Intuition style
   useEffect(() => {
@@ -75,16 +89,16 @@ export default function NFTMintingPage() {
     const resizeCanvas = () => {
       // Store current canvas state
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      
+
       canvas.width = window.innerWidth * window.devicePixelRatio;
       canvas.height = window.innerHeight * window.devicePixelRatio;
       canvas.style.width = window.innerWidth + "px";
       canvas.style.height = window.innerHeight + "px";
-      
+
       // Fill with black immediately to prevent flash
       ctx.fillStyle = "black";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-      
+
       ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
     };
 
@@ -136,20 +150,19 @@ export default function NFTMintingPage() {
       }
     };
 
-
     createConstellationGrid();
 
     // Handle resize with particle repositioning
     const handleResize = () => {
       resizeCanvas();
-      
+
       // Reposition existing particles to stay within bounds
-      points.forEach(point => {
+      points.forEach((point) => {
         if (point.x > window.innerWidth) point.x = window.innerWidth - 50;
         if (point.y > window.innerHeight) point.y = window.innerHeight - 50;
         if (point.x < 0) point.x = 50;
         if (point.y < 0) point.y = 50;
-        
+
         // Adjust origin positions
         point.originX = Math.min(point.originX, window.innerWidth);
         point.originY = Math.min(point.originY, window.innerHeight);
@@ -159,7 +172,7 @@ export default function NFTMintingPage() {
     // Regenerate particles with adaptive density
     const regenerateParticles = () => {
       points.length = 0; // Clear existing particles
-      
+
       // Recalculate particle count based on screen size (reduced density)
       const particleCount = Math.floor((window.innerWidth * window.innerHeight) / 20000); // Reduced density
       const gridSize = Math.sqrt(particleCount);
@@ -261,7 +274,6 @@ export default function NFTMintingPage() {
         ctx.arc(point.x, point.y, point.size, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(255, 255, 255, ${point.opacity})`;
         ctx.fill();
-
       });
 
       // Draw dynamic connections with max 2 connections per point (reduced)
@@ -272,10 +284,10 @@ export default function NFTMintingPage() {
 
       points.forEach((particle, i) => {
         let connectionCount = 0;
-        
+
         for (let j = i + 1; j < points.length; j++) {
           if (connectionCount >= maxConnectionsPerPoint) break;
-          
+
           const otherParticle = points[j];
           const dx = particle.x - otherParticle.x;
           const dy = particle.y - otherParticle.y;
@@ -468,7 +480,7 @@ export default function NFTMintingPage() {
                 metadata = {
                   name: `Genesis NFT #${tokenId}`,
                   description: `Intuition Network early builder badge #${tokenId}`,
-                  image: `/placeholder.svg?height=300&width=300&query=Genesis%20NFT%20${tokenId}`,
+                  image: `/genesis-nft.png`,
                 };
               }
 
@@ -481,7 +493,7 @@ export default function NFTMintingPage() {
                 metadata: {
                   name: `Genesis NFT #${tokenId}`,
                   description: `Intuition Network early builder badge #${tokenId}`,
-                  image: `/placeholder.svg?height=300&width=300&query=Genesis%20NFT%20${tokenId}`,
+                  image: `/genesis-nft.png`,
                 },
               });
             }
@@ -572,42 +584,75 @@ export default function NFTMintingPage() {
       <canvas
         ref={canvasRef}
         className="fixed inset-0 pointer-events-none z-0"
-        style={{ width: "100vw", height: "100vh", backgroundColor: 'black' }}
+        style={{ width: "100vw", height: "100vh", backgroundColor: "black" }}
       />
       <header className="fixed top-0 left-0 right-0 z-20 h-16 sm:h-18 lg:h-20">
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
           <div className="flex items-center justify-between h-full">
-            <h1 className="text-lg xs:text-xl font-bold text-white tracking-wide">
-              GENESIS NFT
-            </h1>
+            <h1 className="text-lg xs:text-xl font-bold text-white tracking-wide">GENESIS NFT</h1>
 
             {account ? (
-              <div 
-                onClick={disconnectWallet}
-                className="flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-1.5 sm:py-2 cursor-pointer transition-all rounded-xl hover:scale-105 bg-white/95 border border-black/10 text-gray-900 font-semibold text-xs sm:text-sm"
-              >
-                <span className="font-bold text-gray-900 hidden xs:inline">
-                  {userBalance} tTRUST
-                </span>
-                <div 
-                  className="flex items-center gap-1 sm:gap-2 pl-0 xs:pl-3 border-l-0 xs:border-l border-black/10"
+              <div className="relative" ref={dropdownRef}>
+                <div
+                  onClick={() => setShowDropdown(!showDropdown)}
+                  className="flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-1.5 sm:py-2 cursor-pointer transition-all rounded-xl hover:scale-105 bg-white/95 border border-black/10 text-gray-900 font-semibold text-xs sm:text-sm"
                 >
-                  <div 
-                    className="w-4 sm:w-5 h-4 sm:h-5 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500"
-                  />
-                  <span className="text-gray-600 font-medium text-xs sm:text-sm">
-                    {`${account.slice(0, 3)}...${account.slice(-3)}`}
+                  <span className="font-bold text-gray-900 hidden xs:inline">
+                    {userBalance} tTRUST
                   </span>
-                  <svg 
-                    className="w-3 sm:w-4 h-3 sm:h-4" 
-                    viewBox="0 0 20 20" 
-                    fill="none" 
-                    stroke="#6b7280" 
-                    strokeWidth="2"
-                  >
-                    <path d="M5.25 7.5l4.25 4.25L13.75 7.5" />
-                  </svg>
+                  <div className="flex items-center gap-1 sm:gap-2 pl-0 xs:pl-3 border-l-0 xs:border-l border-black/10">
+                    <div className="w-4 sm:w-5 h-4 sm:h-5 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500" />
+                    <span className="text-gray-600 font-medium text-xs sm:text-sm">
+                      {`${account.slice(0, 3)}...${account.slice(-3)}`}
+                    </span>
+                    <ChevronDown className={`w-3 sm:w-4 h-3 sm:h-4 transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
+                  </div>
                 </div>
+
+                {/* Dropdown Menu */}
+                {showDropdown && (
+                  <div className="absolute top-full right-0 mt-2 w-full rounded-lg shadow-lg z-50"
+                       style={{
+                         background: "rgba(255, 255, 255, 0.95)",
+                         backdropFilter: "blur(10px)",
+                         WebkitBackdropFilter: "blur(10px)",
+                         border: "1px solid rgba(255, 255, 255, 0.2)"
+                       }}>
+                    <div className="py-2">
+                      <button 
+                        onClick={() => {
+                          window.open('https://testnet.explorer.intuition.systems', '_blank');
+                          setShowDropdown(false);
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-white/50 transition-colors"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                        View on Intuition-Testnet Explorer
+                      </button>
+                      <button 
+                        onClick={() => {
+                          navigator.clipboard.writeText(account);
+                          setShowDropdown(false);
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-white/50 transition-colors"
+                      >
+                        <Copy className="h-4 w-4" />
+                        Copy Address
+                      </button>
+                      <div className="border-t border-gray-200 my-1"></div>
+                      <button 
+                        onClick={() => {
+                          disconnectWallet();
+                          setShowDropdown(false);
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                      >
+                        <LogOut className="h-4 w-4" />
+                        Disconnect
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <Button
@@ -620,9 +665,7 @@ export default function NFTMintingPage() {
                 ) : (
                   <Wallet className="h-4 w-4" />
                 )}
-                <span>
-                  {isConnecting ? "Connecting..." : "Connect Wallet"}
-                </span>
+                <span>{isConnecting ? "Connecting..." : "Connect Wallet"}</span>
               </Button>
             )}
           </div>
@@ -632,228 +675,288 @@ export default function NFTMintingPage() {
       <main className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 min-h-screen pt-20 sm:pt-24 lg:pt-28 flex flex-col">
         <div className="flex-1 flex flex-col">
           <div className="text-center">
-          <h2 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold mb-4 bg-gradient-to-br from-white to-slate-400 bg-clip-text text-transparent leading-tight">
-            Hello Intuition Builder
-          </h2>
-          <p className="text-sm xs:text-base text-white/70 max-w-2xl mx-auto leading-relaxed">
-            An early builder badge on the Intuition Network.
-          </p>
-        </div>
-
-        <div className="flex-1 flex flex-col justify-center">
-
-        {(networkError || showNetworkInstructions) && (
-          <div className="max-w-2xl mx-auto mb-6 sm:mb-8">
-            <Card className="border-red-500/50 backdrop-blur-md" style={{background: 'rgba(26, 27, 31, 0.5)'}}>
-              <CardHeader>
-                <CardTitle className="text-red-400 flex items-center gap-2">
-                  <Wallet className="h-5 w-5" />
-                  Network Setup Required
-                </CardTitle>
-                <CardDescription className="text-red-300">{networkError}</CardDescription>
-              </CardHeader>
-              {showNetworkInstructions && (
-                <CardContent className="space-y-3 sm:space-y-4 p-0">
-                  <div className="text-sm text-gray-400 space-y-2">
-                    <p className="font-semibold">To manually add Intuition Testnet:</p>
-                    <ol className="list-decimal list-inside space-y-1 text-gray-400">
-                      <li>Open your wallet settings</li>
-                      <li>Go to "Networks" or "Add Network"</li>
-                      <li>Add a new network with these details:</li>
-                    </ol>
-                    <div className="bg-gray-900 p-3 rounded-md text-xs font-mono text-gray-300 space-y-1">
-                      <div>
-                        <strong>Network Name:</strong> Intuition Testnet
-                      </div>
-                      <div>
-                        <strong>RPC URL:</strong> https://testnet.rpc.intuition.systems/http
-                      </div>
-                      <div>
-                        <strong>Chain ID:</strong> 13579
-                      </div>
-                      <div>
-                        <strong>Currency Symbol:</strong> tTRUST
-                      </div>
-                      <div>
-                        <strong>Block Explorer:</strong> https://testnet.explorer.intuition.systems
-                      </div>
-                    </div>
-                  </div>
-                  <Button onClick={connectWallet} disabled={isConnecting} className="w-full">
-                    {isConnecting ? "Connecting..." : "Try Again"}
-                  </Button>
-                </CardContent>
-              )}
-            </Card>
+            <h2 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold mb-4 bg-gradient-to-br from-white to-slate-400 bg-clip-text text-transparent leading-tight">
+              Hello Intuition Builder
+            </h2>
+            <p className="text-sm xs:text-base text-white/70 max-w-2xl mx-auto leading-relaxed">
+              An early builder badge on the Intuition Network.
+            </p>
           </div>
-        )}
 
-        {/* Mint card - only show when wallet not connected */}
-        {!account && (
-        <div className="max-w-lg mx-auto w-full mb-6">
-          <Card className="p-6 sm:p-8 lg:p-10 backdrop-blur-[20px] border border-white/10 shadow-xl shadow-black/50" style={{background: 'rgba(26, 27, 31, 0.35)'}}>
-            <CardHeader className="text-center p-0 mb-6">
-              <CardTitle className="text-2xl sm:text-3xl font-bold text-white mb-3">Mint Your NFT</CardTitle>
-              <CardDescription className="text-white/70 text-base sm:text-lg">
-                Connect your wallet to get started
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Button
-                onClick={connectWallet}
-                disabled={isConnecting}
-                className="w-full h-14 sm:h-16 text-base sm:text-lg font-semibold bg-white/95 text-gray-900 hover:bg-white hover:-translate-y-1 transition-all rounded-xl"
-              >
-                {isConnecting ? (
-                  <>
-                    <Loader2 className="h-5 w-5 animate-spin mr-2" />
-                    Connecting...
-                  </>
-                ) : (
-                  <>
-                    <Wallet className="h-5 w-5 mr-2" />
-                    Connect Wallet
-                  </>
-                )}
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-        )}
-
-        {/* Stats cards - only show when wallet not connected */}
-        {!account && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mx-auto w-full">
-          <Card className="text-center p-5 sm:p-6 backdrop-blur-[25px] border border-white/10 hover:bg-white/5 transition-all duration-300 shadow-xl shadow-black/50" style={{background: 'rgba(26, 27, 31, 0.35)'}}>
-            <CardHeader className="text-center p-0">
-              <CardTitle className="text-xl sm:text-2xl font-extrabold text-white mb-2">
-                {totalSupply}/{maxSupply}
-              </CardTitle>
-              <CardDescription className="text-white/60 text-sm sm:text-base font-medium">Minted Supply</CardDescription>
-            </CardHeader>
-          </Card>
-
-          <Card className="text-center p-5 sm:p-6 backdrop-blur-[25px] border border-white/10 hover:bg-white/5 transition-all duration-300 shadow-xl shadow-black/50" style={{background: 'rgba(26, 27, 31, 0.35)'}}>
-            <CardHeader className="text-center p-0">
-              <CardTitle className="text-xl sm:text-2xl font-extrabold text-white mb-2">
-                {mintPrice === "0" ? "Free Mint" : `${mintPrice} tTRUST`}
-              </CardTitle>
-              <CardDescription className="text-white/60 text-sm sm:text-base font-medium">Mint Price</CardDescription>
-            </CardHeader>
-          </Card>
-        </div>
-        )}
-        </div>
-
-        {/* When wallet connected - show either mint interface or collection */}
-        {account && (
           <div className="flex-1 flex flex-col justify-center">
-            {/* Mint interface when connected but no NFTs */}
-            {userNFTs.length === 0 && (
-              <div className="max-w-md mx-auto w-full mb-20">
-                <Card className="p-5 xs:p-6 sm:p-8 backdrop-blur-[20px] border border-white/10 shadow-xl shadow-black/50" style={{background: 'rgba(26, 27, 31, 0.35)'}}>
-                  <CardHeader className="text-center p-0 mb-4 sm:mb-6">
-                    <CardTitle className="text-xl sm:text-2xl font-bold text-white mb-3">Mint Your NFT</CardTitle>
-                    <CardDescription className="text-white/70 text-sm sm:text-base">
-                      Ready to mint your unique NFT
-                    </CardDescription>
+            {(networkError || showNetworkInstructions) && (
+              <div className="max-w-2xl mx-auto mb-6 sm:mb-8">
+                <Card
+                  className="border-red-500/50 rounded-2xl"
+                  style={{
+                    background: "rgba(255, 255, 255, 0.08)",
+                    boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
+                    backdropFilter: "blur(6.0px)",
+                    WebkitBackdropFilter: "blur(6.0px)",
+                  }}
+                >
+                  <CardHeader>
+                    <CardTitle className="text-red-400 flex items-center gap-2">
+                      <Wallet className="h-5 w-5" />
+                      Network Setup Required
+                    </CardTitle>
+                    <CardDescription className="text-red-300">{networkError}</CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    {!networkError && !isMinting && (
-                      <div className="text-center text-sm text-emerald-400 bg-emerald-900/30 p-2 rounded-md">
-                        ✓ Connected to Intuition Testnet
+                  {showNetworkInstructions && (
+                    <CardContent className="space-y-3 sm:space-y-4 p-0">
+                      <div className="text-sm text-gray-400 space-y-2">
+                        <p className="font-semibold">To manually add Intuition Testnet:</p>
+                        <ol className="list-decimal list-inside space-y-1 text-gray-400">
+                          <li>Open your wallet settings</li>
+                          <li>Go to "Networks" or "Add Network"</li>
+                          <li>Add a new network with these details:</li>
+                        </ol>
+                        <div className="bg-gray-900 p-3 rounded-md text-xs font-mono text-gray-300 space-y-1">
+                          <div>
+                            <strong>Network Name:</strong> Intuition Testnet
+                          </div>
+                          <div>
+                            <strong>RPC URL:</strong> https://testnet.rpc.intuition.systems/http
+                          </div>
+                          <div>
+                            <strong>Chain ID:</strong> 13579
+                          </div>
+                          <div>
+                            <strong>Currency Symbol:</strong> tTRUST
+                          </div>
+                          <div>
+                            <strong>Block Explorer:</strong>{" "}
+                            https://testnet.explorer.intuition.systems
+                          </div>
+                        </div>
                       </div>
-                    )}
-
-                    <Button
-                      onClick={mintNFT}
-                      disabled={isMinting || totalSupply >= maxSupply || !!networkError}
-                      className="w-full h-12 sm:h-14 text-sm sm:text-base font-semibold bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/10 hover:border-blue-500/50 hover:-translate-y-1 transition-all rounded-xl"
-                    >
-                      {isMinting ? (
-                        <>
-                          <Loader2 className="h-5 w-5 animate-spin mr-2" />
-                          Minting...
-                        </>
-                      ) : totalSupply >= maxSupply ? (
-                        "Sold Out"
-                      ) : (
-                        `${mintPrice === "0" ? "Mint Free" : `Mint for ${mintPrice} tTRUST`}`
-                      )}
-                    </Button>
-                  </CardContent>
+                      <Button onClick={connectWallet} disabled={isConnecting} className="w-full">
+                        {isConnecting ? "Connecting..." : "Try Again"}
+                      </Button>
+                    </CardContent>
+                  )}
                 </Card>
               </div>
             )}
 
-            {/* Collection when user has NFTs */}
-            {userNFTs.length > 0 && (
+            {/* Mint card - only show when wallet not connected */}
+            {!account && (
               <div>
                 <h3 className="text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl font-serif font-bold text-white text-center mb-8">
-                  Your NFT Collection
+                  Mint Your NFT
                 </h3>
-
-            {isLoading ? (
-              <div className="flex justify-center items-center py-6 sm:py-8 lg:py-12">
-                <Loader2 className="h-6 w-6 sm:h-8 sm:w-8 animate-spin" />
-                <span className="ml-2 text-xs sm:text-sm text-gray-400">
-                  Loading your NFTs...
-                </span>
-              </div>
-            ) : userNFTs.length > 0 ? (
-              <div className="flex justify-center">
-                <div className="max-w-sm w-full">
-                {userNFTs.map((nft) => (
+                <div className="max-w-lg mx-auto w-full mb-6">
                   <Card
-                    key={nft.tokenId}
-                    className="hover:scale-[1.02] transition-all duration-300 cursor-pointer group backdrop-blur-[25px] border border-white/10 hover:bg-white/5 relative z-10 overflow-hidden shadow-lg shadow-black/40"
-                    style={{background: 'rgba(26, 27, 31, 0.4)'}}
+                    className="p-6 sm:p-8 lg:p-10 rounded-2xl border-0"
+                    style={{
+                      background: "rgba(255, 255, 255, 0.15)",
+                      boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
+                      backdropFilter: "blur(8.7px)",
+                      WebkitBackdropFilter: "blur(8.7px)",
+                    }}
                   >
-                    <div className="aspect-square relative overflow-hidden bg-gray-800">
-                      <img
-                        src={nft.metadata.image || "/placeholder.svg"}
-                        alt={nft.metadata.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    </div>
-                    <CardContent className="p-5 sm:p-6">
-                      <h4 className="font-serif font-bold text-base sm:text-lg lg:text-xl text-white mb-3 text-center">
-                        {nft.metadata.name}
-                      </h4>
-                      <p className="text-sm sm:text-base text-gray-300 text-center mb-4 leading-relaxed">
-                        {nft.metadata.description}
-                      </p>
-                      <div className="flex justify-center">
-                        <Badge variant="outline" className="text-sm text-gray-400 border-gray-500 px-3 py-1">
-                          #{nft.tokenId}
-                        </Badge>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                    <CardHeader className="text-center p-0 mb-6">
+                      <CardDescription className="text-white/70 text-base sm:text-lg">
+                        Connect your wallet to get started
+                      </CardDescription>
+                    </CardHeader>
+                  <CardContent className="space-y-4">
+                    <Button
+                      onClick={connectWallet}
+                      disabled={isConnecting}
+                      className="w-full h-14 sm:h-16 text-base sm:text-lg font-semibold bg-white/95 text-gray-900 hover:bg-white hover:-translate-y-1 transition-all rounded-xl"
+                    >
+                      {isConnecting ? (
+                        <>
+                          <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                          Connecting...
+                        </>
+                      ) : (
+                        <>
+                          <Wallet className="h-5 w-5 mr-2" />
+                          Connect Wallet
+                        </>
+                      )}
+                    </Button>
+                  </CardContent>
+                </Card>
                 </div>
               </div>
-            ) : (
-              <div className="text-center py-6 xs:py-8 sm:py-12 lg:py-16">
-                <ImageIcon className="h-10 w-10 xs:h-12 xs:w-12 sm:h-16 sm:w-16 text-gray-400 mx-auto mb-3 sm:mb-4" />
-                <h4 className="text-base xs:text-lg sm:text-xl font-serif font-bold text-white mb-2">
-                  No NFTs Yet
-                </h4>
-                <p className="text-xs xs:text-sm sm:text-base text-gray-400 max-w-md mx-auto px-4">
-                  Mint your first NFT to see it appear in your collection!
-                </p>
-              </div>
             )}
+
+            {/* Stats cards - only show when wallet not connected */}
+            {!account && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mx-auto w-full">
+                <Card
+                  className="text-center p-5 sm:p-6 hover:bg-white/5 transition-all duration-300 rounded-2xl border-0"
+                  style={{
+                    background: "rgba(255, 255, 255, 0.15)",
+                    boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
+                    backdropFilter: "blur(8.7px)",
+                    WebkitBackdropFilter: "blur(8.7px)",
+                  }}
+                >
+                  <CardHeader className="text-center p-0">
+                    <CardTitle className="text-xl sm:text-2xl font-extrabold text-white mb-2">
+                      {totalSupply}/{maxSupply}
+                    </CardTitle>
+                    <CardDescription className="text-white/60 text-sm sm:text-base font-medium">
+                      Minted Supply
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+
+                <Card
+                  className="text-center p-5 sm:p-6 hover:bg-white/5 transition-all duration-300 rounded-2xl border-0"
+                  style={{
+                    background: "rgba(255, 255, 255, 0.15)",
+                    boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
+                    backdropFilter: "blur(8.7px)",
+                    WebkitBackdropFilter: "blur(8.7px)",
+                  }}
+                >
+                  <CardHeader className="text-center p-0">
+                    <CardTitle className="text-xl sm:text-2xl font-extrabold text-white mb-2">
+                      {mintPrice === "0" ? "Free Mint" : `${mintPrice} tTRUST`}
+                    </CardTitle>
+                    <CardDescription className="text-white/60 text-sm sm:text-base font-medium">
+                      Mint Price
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
               </div>
             )}
           </div>
-        )}
+
+          {/* When wallet connected - show either mint interface or collection */}
+          {account && (
+            <div className="flex-1 flex flex-col justify-center">
+              {/* Mint interface when connected but no NFTs */}
+              {userNFTs.length === 0 && (
+                <div>
+                  <h3 className="text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl font-serif font-bold text-white text-center mb-8">
+                    Mint Your NFT
+                  </h3>
+                  <div className="max-w-md mx-auto w-full mb-20">
+                    <Card
+                      className="p-5 xs:p-6 sm:p-8 rounded-2xl border-0"
+                      style={{
+                        background: "rgba(255, 255, 255, 0.15)",
+                        boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
+                        backdropFilter: "blur(8.7px)",
+                        WebkitBackdropFilter: "blur(8.7px)",
+                      }}
+                    >
+                      <CardHeader className="text-center p-0 mb-4 sm:mb-6">
+                        <CardDescription className="text-white/70 text-sm sm:text-base">
+                          Ready to mint your unique NFT
+                        </CardDescription>
+                      </CardHeader>
+                    <CardContent className="space-y-4">
+                      {!networkError && !isMinting && (
+                        <div className="text-center text-sm text-emerald-400 bg-emerald-900/30 p-2 rounded-md">
+                          ✓ Connected to Intuition Testnet
+                        </div>
+                      )}
+
+                      <Button
+                        onClick={mintNFT}
+                        disabled={isMinting || totalSupply >= maxSupply || !!networkError}
+                        className="w-full h-12 sm:h-14 text-sm sm:text-base font-semibold bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/10 hover:border-blue-500/50 hover:-translate-y-1 transition-all rounded-xl"
+                      >
+                        {isMinting ? (
+                          <>
+                            <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                            Minting...
+                          </>
+                        ) : totalSupply >= maxSupply ? (
+                          "Sold Out"
+                        ) : (
+                          `${mintPrice === "0" ? "Mint Free" : `Mint for ${mintPrice} tTRUST`}`
+                        )}
+                      </Button>
+                    </CardContent>
+                  </Card>
+                  </div>
+                </div>
+              )}
+
+              {/* Collection when user has NFTs */}
+              {userNFTs.length > 0 && (
+                <div>
+                  <h3 className="text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl font-serif font-bold text-white text-center mb-8">
+                    Your NFT
+                  </h3>
+
+                  {isLoading ? (
+                    <div className="flex justify-center items-center py-6 sm:py-8 lg:py-12">
+                      <Loader2 className="h-6 w-6 sm:h-8 sm:w-8 animate-spin" />
+                      <span className="ml-2 text-xs sm:text-sm text-gray-400">
+                        Loading your NFTs...
+                      </span>
+                    </div>
+                  ) : userNFTs.length > 0 ? (
+                    <div className="flex justify-center">
+                      <div className="max-w-sm w-full">
+                        {userNFTs.map((nft) => (
+                          <Card
+                            key={nft.tokenId}
+                            className="hover:scale-[1.02] transition-all duration-300 cursor-pointer group hover:bg-white/5 relative z-10 overflow-hidden rounded-2xl border-0"
+                            style={{
+                              background: "rgba(255, 255, 255, 0.15)",
+                              boxShadow: "0 4px 30px rgba(0, 0, 0, 0.1)",
+                              backdropFilter: "blur(8.7px)",
+                              WebkitBackdropFilter: "blur(8.7px)",
+                            }}
+                          >
+                            <div className="aspect-square relative overflow-hidden bg-gray-800">
+                              <img
+                                src={nft.metadata.image || "/genesis-nft.png"}
+                                alt={nft.metadata.name}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              />
+                            </div>
+                            <CardContent className="p-5 sm:p-6">
+                              <h4 className="font-serif font-bold text-base sm:text-lg lg:text-xl text-white mb-3 text-center">
+                                {nft.metadata.name}
+                              </h4>
+                              <p className="text-sm sm:text-base text-gray-300 text-center mb-4 leading-relaxed">
+                                {nft.metadata.description}
+                              </p>
+                              <div className="flex justify-center">
+                                <Badge
+                                  variant="outline"
+                                  className="text-sm text-gray-400 border-gray-500 px-3 py-1"
+                                >
+                                  #{nft.tokenId}
+                                </Badge>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-6 xs:py-8 sm:py-12 lg:py-16">
+                      <ImageIcon className="h-10 w-10 xs:h-12 xs:w-12 sm:h-16 sm:w-16 text-gray-400 mx-auto mb-3 sm:mb-4" />
+                      <h4 className="text-base xs:text-lg sm:text-xl font-serif font-bold text-white mb-2">
+                        No NFTs Yet
+                      </h4>
+                      <p className="text-xs xs:text-sm sm:text-base text-gray-400 max-w-md mx-auto px-4">
+                        Mint your first NFT to see it appear in your collection!
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         <footer className="w-full text-center py-6 mt-auto">
-        <p className="text-xs sm:text-sm text-gray-400">
-          Built with React, Ethers.js, and modern Web3 technologies
-        </p>
+          <p className="text-xs sm:text-sm text-gray-400">
+            Built with React, Ethers.js, and modern Web3 technologies
+          </p>
         </footer>
       </main>
     </div>
